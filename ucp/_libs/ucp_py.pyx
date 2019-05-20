@@ -72,7 +72,6 @@ def ucp_logger(fxn):
     else:
         return fxn
     LOGGER.debug('done with ucxpy init')
-    
 
     return wrapper
 
@@ -604,6 +603,8 @@ def init():
 
     return rval
 
+listener_futures = []
+
 @ucp_logger
 def start_listener(py_func, listener_port = -1, is_coroutine = False):
     """Start listener to accept incoming connections
@@ -661,6 +662,7 @@ def start_listener(py_func, listener_port = -1, is_coroutine = False):
             s.close()
             port = addr[1]
 
+        listener_futures.append(lf)
         listener.listener_ptr = ucp_py_listen(accept_callback, <void *>lf, <int *> &port)
         if <void *> NULL != listener.listener_ptr:
             lf.listener = listener
